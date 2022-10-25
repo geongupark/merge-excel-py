@@ -1,0 +1,10 @@
+{
+    "root_path":"./large_test_data",
+    "step_col_name":"Step number",
+    "target_step_num":12,
+    "result_categories":{
+        "voltage":["a1", "a10", "a101", "a179"],
+        "current":["a2", "a20", "a148", "a187"]
+    }
+    
+}
