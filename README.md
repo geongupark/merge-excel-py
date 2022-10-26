@@ -8,6 +8,7 @@ env\Scripts\activate.bat
 
 # 2. Install the package
 pip install pandas
+pip install openpyxl
 
 # 3. Run the script
 # Modify the config.json
