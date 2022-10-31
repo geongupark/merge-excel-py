@@ -73,17 +73,22 @@ def main():
     for target_file in target_files:
         df = load_excel_file(target_file)
         target_df = df[df[step_col_name]==target_step_num]
-        target_df["date_file"] = "_".join([os.path.dirname(target_file).split('\\')[-1], os.path.basename(target_file).split('.')[0]])
+        date_file = "_".join([os.path.dirname(target_file).split('\\')[-1], os.path.basename(target_file).split('.')[0]])
         
         for category_name, col_names in result_categories.items():
-            category_data = target_df[['date_file', *col_names]]
-
+            category_data_df = target_df[[*col_names]]
+            date_file_list = [date_file for _ in category_data_df.columns]
+            header_df = pd.DataFrame([date_file_list, list(category_data_df.columns).copy()])
+            
             (mode, if_sheet_exists) = ('a', 'overlay') if os.path.exists(result_file_path) else ('w', None)
             with pd.ExcelWriter(result_file_path, engine='openpyxl', mode=mode, if_sheet_exists=if_sheet_exists) as writer: # pylint: disable=abstract-class-instantiated
                 if category_name in writer.sheets:
-                    category_data.to_excel(writer, sheet_name=category_name, startrow=writer.sheets[category_name].max_row, header=False, index=False)
+                    start_column = writer.sheets[category_name].max_column
+                    header_df.to_excel(writer, sheet_name=category_name, startcol=start_column, header=False, index=False)
+                    category_data_df.to_excel(writer, sheet_name=category_name, startrow=header_df.shape[0], startcol=start_column, header=False, index=False)
                 else:
-                    category_data.to_excel(writer, sheet_name=category_name, index=False)
+                    header_df.to_excel(writer, sheet_name=category_name, header=False, index=False)
+                    category_data_df.to_excel(writer, sheet_name=category_name, startrow=writer.sheets[category_name].max_row, header=False, index=False)
 
 if __name__=="__main__":
     main()
